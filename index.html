@@ -7,19 +7,157 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- Navigation Bar -->
     <nav>
-        <h1>College Complaint Management</h1>
+        <h1>📌 Complaint Management</h1>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="complaint.html">File a Complaint</a></li>
-            <li><a href="complaints.html">View Complaints</a></li>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="complaint.html">📝 File Complaint</a></li>
+            <li><a href="complaints.html">📋 Track Complaints</a></li>
         </ul>
     </nav>
 
-    <section>
-        <h2>Welcome to the College Complaint Management System</h2>
-        <p>We are here to address your concerns. File a complaint, and we’ll work on resolving it!</p>
-        <a href="complaint.html" class="btn">File a Complaint</a>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-content">
+            <h2>Welcome to the College Complaint System 🎓</h2>
+            <p>We value your feedback. Submit your concerns, and we’ll work on resolving them efficiently.</p>
+            <a href="complaint.html" class="btn">📩 File a Complaint</a>
+        </div>
     </section>
+
 </body>
+
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
+
+    /* Navigation Bar */
+    nav {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
+
+    nav h1 {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        padding-right: 20px;
+        margin: 0;
+    }
+
+    nav ul li {
+        margin: 0 10px;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        padding: 10px;
+        transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+    }
+
+    /* Hero Section */
+    .hero {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 70vh;
+        background: linear-gradient(to right, #007bff, #0056b3);
+        color: white;
+        padding: 20px;
+    }
+
+    .hero-content {
+        max-width: 600px;
+        text-align: center;
+    }
+
+    h2 {
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+
+    p {
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    /* Button */
+    .btn {
+        padding: 12px 24px;
+        background-color: white;
+        color: #007bff;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 18px;
+        font-weight: bold;
+        transition: 0.3s ease;
+        text-decoration: none;
+        display: inline-block;
+    }
+
+    .btn:hover {
+        background-color: #f8f9fa;
+        transform: scale(1.05);
+    }
+
+    /* Responsive Design */
+    @media screen and (max-width: 600px) {
+        nav {
+            flex-direction: column;
+            text-align: center;
+        }
+
+        nav ul {
+            padding: 0;
+            justify-content: center;
+        }
+
+        nav ul li {
+            margin: 5px 0;
+        }
+
+        .hero {
+            height: 60vh;
+            padding: 30px;
+        }
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        p {
+            font-size: 1rem;
+        }
+
+        .btn {
+            font-size: 16px;
+        }
+    }
+</style>
+
 </html>

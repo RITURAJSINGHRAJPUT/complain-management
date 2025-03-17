@@ -7,110 +7,248 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- Navigation Bar -->
     <nav>
-        <h1>College Complaint Management</h1>
+        <h1>📌 Complaint Management</h1>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="complaint.html">File a Complaint</a></li>
-            <li><a href="complaints.html">View Complaints</a></li>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="complaint.html">📝 File Complaint</a></li>
+            <li><a href="complaints.html">📋 Track Complaints</a></li>
         </ul>
     </nav>
 
-    <section>
-        <h2>Verify Your Student ID</h2>
+    <!-- ID Verification Section -->
+    <section class="container">
+        <h2>🆔 Verify Your Student ID</h2>
         <input type="file" id="idUpload" accept="image/*">
-        <button onclick="verifyID()">Verify ID Card</button>
+        <button class="btn" onclick="verifyID()">Verify ID Card</button>
         <p id="verificationStatus"></p>
     </section>
 
-    <section id="complaintSection" style="display:none;">
-        <h2>Register Your Complaint</h2>
-        <p>Your Reference No: <span id="refNo"></span></p>
+    <!-- Complaint Submission Section -->
+    <section id="complaintSection" class="container hidden">
+        <h2>📝 Register Your Complaint</h2>
+        <p><b>Your Reference No:</b> <span id="refNo"></span></p>
 
-        <label for="complaintText"><b>Complaint Details:</b></label>
+        <label for="complaintText">Complaint Details:</label>
         <textarea id="complaintText" placeholder="Describe your complaint" required></textarea>
 
-        <label for="complaintImage"><b>Upload Image Proof:</b></label>
+        <label for="complaintImage">Upload Image Proof:</label>
         <input type="file" id="complaintImage" accept="image/*" onchange="previewImage()">
-        <div id="imagePreview" style="margin-top: 10px;"></div>
+        <div id="imagePreview"></div>
 
         <button class="btn" onclick="submitComplaint()">Submit Complaint</button>
         <p id="statusMessage"></p>
     </section>
 
-    <script>
-        function verifyID() {
-            let idUpload = document.getElementById("idUpload").files[0];
+</body>
 
-            if (!idUpload) {
-                alert("Please upload an ID card image.");
-                return;
-            }
+<style>
+    /* General Styles */
+    body {
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f7fc;
+        margin: 0;
+        padding: 0;
+        text-align: center;
+    }
 
-            // Simulating verification
-            setTimeout(() => {
-                document.getElementById("verificationStatus").innerHTML = "✅ ID Verified Successfully!";
-                let referenceNumber = "REF" + Math.floor(1000 + Math.random() * 9000);
+    /* Navigation Bar */
+    nav {
+        background-color: #007bff;
+        color: white;
+        padding: 15px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+    }
 
-                localStorage.setItem("verified", "true");
-                localStorage.setItem("referenceNumber", referenceNumber);
-                document.getElementById("refNo").innerText = referenceNumber;
-                
-                // Show Complaint Section
-                document.getElementById("complaintSection").style.display = "block";
-            }, 2000);
+    nav h1 {
+        margin: 0;
+        padding-left: 20px;
+    }
+
+    nav ul {
+        list-style: none;
+        display: flex;
+        padding-right: 20px;
+        margin: 0;
+    }
+
+    nav ul li {
+        margin: 0 10px;
+    }
+
+    nav ul li a {
+        text-decoration: none;
+        color: white;
+        font-weight: bold;
+        padding: 10px;
+        transition: 0.3s;
+    }
+
+    nav ul li a:hover {
+        background-color: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
+    }
+
+    /* Container */
+    .container {
+        background: white;
+        padding: 20px;
+        margin: 20px auto;
+        width: 90%;
+        max-width: 500px;
+        border-radius: 10px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        color: #007bff;
+        font-size: 1.8rem;
+    }
+
+    input, textarea {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+        font-size: 1rem;
+    }
+
+    textarea {
+        height: 100px;
+        resize: none;
+    }
+
+    /* Button */
+    .btn {
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        cursor: pointer;
+        border-radius: 5px;
+        font-size: 16px;
+        font-weight: bold;
+        transition: 0.3s;
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    .btn:hover {
+        background-color: #0056b3;
+        transform: scale(1.05);
+    }
+
+    /* Image Preview */
+    #imagePreview img {
+        width: 100%;
+        max-width: 200px;
+        margin-top: 10px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+
+    /* Hidden Section */
+    .hidden {
+        display: none;
+    }
+
+    /* Responsive */
+    @media screen and (max-width: 600px) {
+        nav {
+            flex-direction: column;
+            text-align: center;
         }
 
-        function previewImage() {
-            let complaintImage = document.getElementById("complaintImage").files[0];
-            let preview = document.getElementById("imagePreview");
-
-            if (complaintImage) {
-                let reader = new FileReader();
-                reader.onload = function(e) {
-                    preview.innerHTML = `<img src="${e.target.result}" width="200" style="border: 1px solid #ddd; padding: 5px;">`;
-                };
-                reader.readAsDataURL(complaintImage);
-            } else {
-                preview.innerHTML = "";
-            }
+        nav ul {
+            padding: 0;
+            justify-content: center;
         }
 
-        function submitComplaint() {
-            let complaintText = document.getElementById("complaintText").value.trim();
-            let complaintImage = document.getElementById("complaintImage").files[0];
-            let referenceNumber = localStorage.getItem("referenceNumber");
+        nav ul li {
+            margin: 5px 0;
+        }
+    }
+</style>
 
-            if (!complaintText) {
-                alert("Please enter a complaint description.");
-                return;
-            }
+<script>
+    function verifyID() {
+        let idUpload = document.getElementById("idUpload").files[0];
 
+        if (!idUpload) {
+            alert("⚠️ Please upload an ID card image.");
+            return;
+        }
+
+        // Simulating ID Verification Process
+        setTimeout(() => {
+            document.getElementById("verificationStatus").innerHTML = "✅ ID Verified Successfully!";
+            let referenceNumber = "REF" + Math.floor(1000 + Math.random() * 9000);
+
+            localStorage.setItem("verified", "true");
+            localStorage.setItem("referenceNumber", referenceNumber);
+            document.getElementById("refNo").innerText = referenceNumber;
+
+            // Show Complaint Section
+            document.getElementById("complaintSection").classList.remove("hidden");
+        }, 2000);
+    }
+
+    function previewImage() {
+        let complaintImage = document.getElementById("complaintImage").files[0];
+        let preview = document.getElementById("imagePreview");
+
+        if (complaintImage) {
             let reader = new FileReader();
-            reader.onload = function(event) {
-                let complaintData = {
-                    refNo: referenceNumber,
-                    complaint: complaintText,
-                    status: "Pending",
-                    image: event.target.result
-                };
+            reader.onload = function(e) {
+                preview.innerHTML = `<img src="${e.target.result}">`;
+            };
+            reader.readAsDataURL(complaintImage);
+        } else {
+            preview.innerHTML = "";
+        }
+    }
 
-                let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
-                complaints.push(complaintData);
-                localStorage.setItem("complaints", JSON.stringify(complaints));
+    function submitComplaint() {
+        let complaintText = document.getElementById("complaintText").value.trim();
+        let complaintImage = document.getElementById("complaintImage").files[0];
+        let referenceNumber = localStorage.getItem("referenceNumber");
 
-                document.getElementById("statusMessage").innerHTML = "✅ Complaint Submitted Successfully!";
-                document.getElementById("complaintText").value = "";
-                document.getElementById("complaintImage").value = "";
-                document.getElementById("imagePreview").innerHTML = "";
+        if (!complaintText) {
+            alert("⚠️ Please enter a complaint description.");
+            return;
+        }
+
+        let reader = new FileReader();
+        reader.onload = function(event) {
+            let complaintData = {
+                refNo: referenceNumber,
+                complaint: complaintText,
+                status: "Pending",
+                image: event.target.result
             };
 
-            if (complaintImage) {
-                reader.readAsDataURL(complaintImage);
-            } else {
-                reader.onload();
-            }
+            let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+            complaints.push(complaintData);
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+
+            document.getElementById("statusMessage").innerHTML = "✅ Complaint Submitted Successfully!";
+            document.getElementById("complaintText").value = "";
+            document.getElementById("complaintImage").value = "";
+            document.getElementById("imagePreview").innerHTML = "";
+        };
+
+        if (complaintImage) {
+            reader.readAsDataURL(complaintImage);
+        } else {
+            reader.onload();
         }
-    </script>
-</body>
+    }
+</script>
+
 </html>

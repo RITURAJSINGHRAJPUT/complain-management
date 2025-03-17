@@ -7,27 +7,33 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+
+    <!-- Navigation Bar -->
     <nav>
-        <h1>College Complaint Management</h1>
+        <h1>📌 Complaint Tracker</h1>
         <ul>
-            <li><a href="index.html">Home</a></li>
-            <li><a href="complaint.html">File a Complaint</a></li>
-            <li><a href="complaints.html">View Complaints</a></li>
+            <li><a href="index.html">🏠 Home</a></li>
+            <li><a href="complaint.html">📝 File Complaint</a></li>
+            <li><a href="complaints.html">📋 Track Complaints</a></li>
         </ul>
     </nav>
 
-    <section>
-        <h2>Track Your Complaint</h2>
+    <!-- Complaint Tracking Section -->
+    <section class="tracking-container">
+        <h2>Track Your Complaint 🔍</h2>
+        <p>Enter your complaint reference number to check the progress.</p>
+
         <input type="text" id="refInput" placeholder="Enter Reference No">
-        <button class="btn" onclick="trackComplaint()">Track</button>
-        <div id="complaintDetails"></div>
+        <button class="btn" onclick="trackComplaint()">🔍 Track</button>
+
+        <div id="complaintDetails" class="complaint-box"></div>
     </section>
 
     <script>
         function trackComplaint() {
             let refNo = document.getElementById("refInput").value.trim();
             if (!refNo) {
-                alert("Please enter a reference number.");
+                alert("❗ Please enter a reference number.");
                 return;
             }
 
@@ -37,15 +43,19 @@
             if (complaint) {
                 let progress = getProgress(complaint.status);
                 document.getElementById("complaintDetails").innerHTML = `
-                    <p><strong>Complaint:</strong> ${complaint.complaint}</p>
-                    <p><strong>Status:</strong> ${complaint.status}</p>
-                    <div class="progress-container">
-                        <div class="progress-bar" style="width:${progress.percentage}%"></div>
+                    <div class="complaint-card">
+                        <h3>📄 Complaint Details</h3>
+                        <p><strong>🔹 Complaint:</strong> ${complaint.complaint}</p>
+                        <p><strong>📌 Status:</strong> ${complaint.status}</p>
+                        
+                        <div class="progress-container">
+                            <div class="progress-bar" style="width:${progress.percentage}%"></div>
+                        </div>
+                        <p class="status-label">${progress.label}</p>
                     </div>
-                    <p>${progress.label}</p>
                 `;
             } else {
-                document.getElementById("complaintDetails").innerHTML = "<p>❌ No complaint found!</p>";
+                document.getElementById("complaintDetails").innerHTML = "<p class='error-message'>❌ No complaint found! Please check your reference number.</p>";
             }
         }
 
@@ -58,36 +68,172 @@
     </script>
 
     <style>
+        /* General Styles */
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        /* Navigation Bar */
+        nav {
+            background-color: #007bff;
+            color: white;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        nav h1 {
+            margin: 0;
+            padding-left: 20px;
+        }
+
+        nav ul {
+            list-style: none;
+            display: flex;
+            padding-right: 20px;
+            margin: 0;
+        }
+
+        nav ul li {
+            margin: 0 10px;
+        }
+
+        nav ul li a {
+            text-decoration: none;
+            color: white;
+            font-weight: bold;
+            padding: 10px;
+            transition: 0.3s;
+        }
+
+        nav ul li a:hover {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        /* Complaint Tracking Section */
+        .tracking-container {
+            max-width: 500px;
+            margin: 40px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        h2 {
+            color: #007bff;
+            margin-bottom: 10px;
+        }
+
+        input {
+            width: 90%;
+            padding: 10px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+
+        .btn:hover {
+            background-color: #0056b3;
+        }
+
+        /* Complaint Box */
+        .complaint-box {
+            margin-top: 20px;
+            padding: 10px;
+        }
+
+        .complaint-card {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        .complaint-card h3 {
+            color: #007bff;
+        }
+
+        .complaint-card p {
+            margin: 5px 0;
+        }
+
+        /* Progress Bar */
         .progress-container {
             width: 100%;
             background-color: #ddd;
             border-radius: 10px;
             height: 20px;
             margin-top: 10px;
+            overflow: hidden;
         }
 
         .progress-bar {
             height: 20px;
+            width: 0%;
             background-color: #4CAF50;
-            text-align: center;
-            line-height: 20px;
-            color: white;
+            transition: width 0.5s ease-in-out;
             border-radius: 10px;
         }
 
-        .btn {
-            padding: 10px 20px;
-            background-color: blue;
-            color: white;
-            border: none;
-            cursor: pointer;
-            border-radius: 5px;
-            margin-top: 10px;
+        .status-label {
+            margin-top: 5px;
+            font-weight: bold;
         }
 
-        .btn:hover {
-            background-color: darkblue;
+        .error-message {
+            color: red;
+            font-weight: bold;
+        }
+
+        /* Responsive Design */
+        @media screen and (max-width: 600px) {
+            nav {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            nav ul {
+                padding: 0;
+                justify-content: center;
+            }
+
+            nav ul li {
+                margin: 5px 0;
+            }
+
+            .tracking-container {
+                width: 90%;
+            }
+        }
+
+        /* Fade-in Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
+
 </body>
 </html>
