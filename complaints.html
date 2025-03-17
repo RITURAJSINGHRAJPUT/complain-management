@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Complaints List</title>
+    <title>Complaint Tracking</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -18,33 +18,76 @@
 
     <section>
         <h2>Track Your Complaint</h2>
-        <input type="text" id="searchRef" placeholder="Enter Reference No">
-        <button class="btn" onclick="searchComplaint()">Track</button>
-        <div id="complaintsContainer"></div>
+        <input type="text" id="refInput" placeholder="Enter Reference No">
+        <button class="btn" onclick="trackComplaint()">Track</button>
+        <div id="complaintDetails"></div>
     </section>
 
     <script>
-        function searchComplaint() {
-            let refNo = document.getElementById("searchRef").value;
+        function trackComplaint() {
+            let refNo = document.getElementById("refInput").value.trim();
+            if (!refNo) {
+                alert("Please enter a reference number.");
+                return;
+            }
+
             let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
-            let container = document.getElementById("complaintsContainer");
+            let complaint = complaints.find(c => c.refNo === refNo);
 
-            container.innerHTML = ""; // Clear previous results
-
-            let found = complaints.filter(comp => comp.refNo === refNo);
-            if (found.length > 0) {
-                found.forEach(comp => {
-                    let div = document.createElement("div");
-                    div.classList.add("complaint-box");
-                    div.innerHTML = `<h3>Reference No: ${comp.refNo}</h3>
-                                     <p>${comp.complaint}</p>
-                                     <p><strong>Status:</strong> ${comp.status}</p>`;
-                    container.appendChild(div);
-                });
+            if (complaint) {
+                let progress = getProgress(complaint.status);
+                document.getElementById("complaintDetails").innerHTML = `
+                    <p><strong>Complaint:</strong> ${complaint.complaint}</p>
+                    <p><strong>Status:</strong> ${complaint.status}</p>
+                    <div class="progress-container">
+                        <div class="progress-bar" style="width:${progress.percentage}%"></div>
+                    </div>
+                    <p>${progress.label}</p>
+                `;
             } else {
-                container.innerHTML = "<p>No complaint found for this reference number.</p>";
+                document.getElementById("complaintDetails").innerHTML = "<p>❌ No complaint found!</p>";
             }
         }
+
+        function getProgress(status) {
+            if (status === "Pending") return { percentage: 33, label: "Pending ⏳" };
+            if (status === "In Progress") return { percentage: 66, label: "In Progress 🛠" };
+            if (status === "Resolved") return { percentage: 100, label: "Resolved ✅" };
+            return { percentage: 0, label: "Unknown Status" };
+        }
     </script>
+
+    <style>
+        .progress-container {
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+            height: 20px;
+            margin-top: 10px;
+        }
+
+        .progress-bar {
+            height: 20px;
+            background-color: #4CAF50;
+            text-align: center;
+            line-height: 20px;
+            color: white;
+            border-radius: 10px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background-color: blue;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+        .btn:hover {
+            background-color: darkblue;
+        }
+    </style>
 </body>
 </html>

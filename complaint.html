@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File a Complaint</title>
     <link rel="stylesheet" href="styles.css">
-    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 <body>
     <nav>
@@ -19,100 +18,99 @@
 
     <section>
         <h2>Verify Your Student ID</h2>
-        <video id="camera" autoplay></video>
-        <button class="btn" onclick="captureImage()">Scan ID Card</button>
-        <canvas id="canvas" style="display:none;"></canvas>
-        <p id="verificationStatus">Please scan your ID.</p>
+        <input type="file" id="idUpload" accept="image/*">
+        <button onclick="verifyID()">Verify ID Card</button>
+        <p id="verificationStatus"></p>
     </section>
 
     <section id="complaintSection" style="display:none;">
-        <h2>File a Complaint</h2>
-        <p><strong>Reference Number:</strong> <span id="refNo"></span></p>
-        <form id="complaintForm">
-            <textarea id="complaint" placeholder="Describe your complaint" required></textarea>
-            <button type="submit" class="btn">Submit Complaint</button>
-        </form>
+        <h2>Register Your Complaint</h2>
+        <p>Your Reference No: <span id="refNo"></span></p>
+
+        <label for="complaintText"><b>Complaint Details:</b></label>
+        <textarea id="complaintText" placeholder="Describe your complaint" required></textarea>
+
+        <label for="complaintImage"><b>Upload Image Proof:</b></label>
+        <input type="file" id="complaintImage" accept="image/*" onchange="previewImage()">
+        <div id="imagePreview" style="margin-top: 10px;"></div>
+
+        <button class="btn" onclick="submitComplaint()">Submit Complaint</button>
+        <p id="statusMessage"></p>
     </section>
 
     <script>
-        let refImagePath = "id_template.jpg";  // Add your template ID image here
-        let isOpencvLoaded = false;
+        function verifyID() {
+            let idUpload = document.getElementById("idUpload").files[0];
 
-        // Load OpenCV
-        function onOpenCvReady() {
-            isOpencvLoaded = true;
-            console.log("OpenCV Loaded Successfully!");
-        }
-
-        // Start Camera
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
-            .then(stream => {
-                document.getElementById("camera").srcObject = stream;
-            });
-
-        function captureImage() {
-            let video = document.getElementById("camera");
-            let canvas = document.getElementById("canvas");
-            let ctx = canvas.getContext("2d");
-
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-            let imageURL = canvas.toDataURL("image/png");
-            verifyID(imageURL);
-        }
-
-        function verifyID(imageURL) {
-            if (!isOpencvLoaded) {
-                alert("Error: OpenCV is still loading. Try again in a few seconds.");
+            if (!idUpload) {
+                alert("Please upload an ID card image.");
                 return;
             }
 
-            let userImg = cv.imread(imageURL);
-            let refImg = cv.imread(refImagePath);
+            // Simulating verification
+            setTimeout(() => {
+                document.getElementById("verificationStatus").innerHTML = "✅ ID Verified Successfully!";
+                let referenceNumber = "REF" + Math.floor(1000 + Math.random() * 9000);
 
-            let userGray = new cv.Mat();
-            let refGray = new cv.Mat();
-
-            cv.cvtColor(userImg, userGray, cv.COLOR_RGBA2GRAY);
-            cv.cvtColor(refImg, refGray, cv.COLOR_RGBA2GRAY);
-
-            let diff = new cv.Mat();
-            cv.absdiff(userGray, refGray, diff);
-
-            let nonZero = cv.countNonZero(diff);
-            console.log("Difference Score:", nonZero);
-
-            if (nonZero < 10000) { // Adjust threshold for better accuracy
-                document.getElementById("verificationStatus").innerText = "✅ ID Verified!";
+                localStorage.setItem("verified", "true");
+                localStorage.setItem("referenceNumber", referenceNumber);
+                document.getElementById("refNo").innerText = referenceNumber;
+                
+                // Show Complaint Section
                 document.getElementById("complaintSection").style.display = "block";
-                document.getElementById("refNo").innerText = generateRefNo();
+            }, 2000);
+        }
+
+        function previewImage() {
+            let complaintImage = document.getElementById("complaintImage").files[0];
+            let preview = document.getElementById("imagePreview");
+
+            if (complaintImage) {
+                let reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `<img src="${e.target.result}" width="200" style="border: 1px solid #ddd; padding: 5px;">`;
+                };
+                reader.readAsDataURL(complaintImage);
             } else {
-                document.getElementById("verificationStatus").innerText = "❌ ID Verification Failed!";
+                preview.innerHTML = "";
+            }
+        }
+
+        function submitComplaint() {
+            let complaintText = document.getElementById("complaintText").value.trim();
+            let complaintImage = document.getElementById("complaintImage").files[0];
+            let referenceNumber = localStorage.getItem("referenceNumber");
+
+            if (!complaintText) {
+                alert("Please enter a complaint description.");
+                return;
             }
 
-            userImg.delete(); refImg.delete();
-            userGray.delete(); refGray.delete();
-            diff.delete();
+            let reader = new FileReader();
+            reader.onload = function(event) {
+                let complaintData = {
+                    refNo: referenceNumber,
+                    complaint: complaintText,
+                    status: "Pending",
+                    image: event.target.result
+                };
+
+                let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+                complaints.push(complaintData);
+                localStorage.setItem("complaints", JSON.stringify(complaints));
+
+                document.getElementById("statusMessage").innerHTML = "✅ Complaint Submitted Successfully!";
+                document.getElementById("complaintText").value = "";
+                document.getElementById("complaintImage").value = "";
+                document.getElementById("imagePreview").innerHTML = "";
+            };
+
+            if (complaintImage) {
+                reader.readAsDataURL(complaintImage);
+            } else {
+                reader.onload();
+            }
         }
-
-        function generateRefNo() {
-            return "COMP" + Math.floor(100000 + Math.random() * 900000);
-        }
-
-        document.getElementById("complaintForm").addEventListener("submit", function(event) {
-            event.preventDefault();
-            let complaintText = document.getElementById("complaint").value;
-            let refNo = document.getElementById("refNo").innerText;
-
-            let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
-            complaints.push({ refNo, complaint: complaintText, status: "Pending" });
-
-            localStorage.setItem("complaints", JSON.stringify(complaints));
-            alert("Complaint submitted successfully!\nReference No: " + refNo);
-            this.reset();
-        });
     </script>
 </body>
 </html>
