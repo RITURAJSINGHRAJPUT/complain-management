@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <nav>
+        <h1>🚀 Admin Panel</h1>
+        <button class="logout-btn" onclick="adminLogout()">Logout</button>
+    </nav>
+
+    <section class="container">
+        <h2>📋 Manage Complaints</h2>
+        <table id="complaintTable">
+            <thead>
+                <tr>
+                    <th>Ref No</th>
+                    <th>Complaint</th>
+                    <th>Image</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                    <th>Delete</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Complaints will be loaded here dynamically -->
+            </tbody>
+        </table>
+    </section>
+
+    <script src="admin.js"></script>
+</body>
+</html>
