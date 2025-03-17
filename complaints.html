@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Complaints List</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <nav>
+        <h1>College Complaint Management</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="complaint.html">File a Complaint</a></li>
+            <li><a href="complaints.html">View Complaints</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <h2>Track Your Complaint</h2>
+        <input type="text" id="searchRef" placeholder="Enter Reference No">
+        <button class="btn" onclick="searchComplaint()">Track</button>
+        <div id="complaintsContainer"></div>
+    </section>
+
+    <script>
+        function searchComplaint() {
+            let refNo = document.getElementById("searchRef").value;
+            let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+            let container = document.getElementById("complaintsContainer");
+
+            container.innerHTML = ""; // Clear previous results
+
+            let found = complaints.filter(comp => comp.refNo === refNo);
+            if (found.length > 0) {
+                found.forEach(comp => {
+                    let div = document.createElement("div");
+                    div.classList.add("complaint-box");
+                    div.innerHTML = `<h3>Reference No: ${comp.refNo}</h3>
+                                     <p>${comp.complaint}</p>
+                                     <p><strong>Status:</strong> ${comp.status}</p>`;
+                    container.appendChild(div);
+                });
+            } else {
+                container.innerHTML = "<p>No complaint found for this reference number.</p>";
+            }
+        }
+    </script>
+</body>
+</html>

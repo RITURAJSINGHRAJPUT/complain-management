@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File a Complaint</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+</head>
+<body>
+    <nav>
+        <h1>College Complaint Management</h1>
+        <ul>
+            <li><a href="index.html">Home</a></li>
+            <li><a href="complaint.html">File a Complaint</a></li>
+            <li><a href="complaints.html">View Complaints</a></li>
+        </ul>
+    </nav>
+
+    <section>
+        <h2>Verify Your Student ID</h2>
+        <video id="camera" autoplay></video>
+        <button class="btn" onclick="captureImage()">Scan ID Card</button>
+        <canvas id="canvas" style="display:none;"></canvas>
+        <p id="verificationStatus"></p>
+    </section>
+
+    <section id="complaintSection" style="display:none;">
+        <h2>File a Complaint</h2>
+        <p><strong>Reference Number:</strong> <span id="refNo"></span></p>
+        <form id="complaintForm">
+            <textarea id="complaint" placeholder="Describe your complaint" required></textarea>
+            <button type="submit" class="btn">Submit Complaint</button>
+        </form>
+    </section>
+
+    <script>
+        // List of valid student IDs for verification
+        const validStudentIDs = ["2024001", "2024002", "2024003"]; // Add actual student IDs
+
+        // Camera Setup
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: 1280, height: 720 } })
+            .then(stream => {
+                document.getElementById('camera').srcObject = stream;
+            });
+
+        function captureImage() {
+            let video = document.getElementById("camera");
+            let canvas = document.getElementById("canvas");
+            let ctx = canvas.getContext("2d");
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+            // Convert to Image URL
+            let imageURL = canvas.toDataURL("image/png");
+            processOCR(imageURL);
+        }
+
+        function processOCR(imageURL) {
+            Tesseract.recognize(imageURL, 'eng')
+                .then(({ data: { text } }) => {
+                    console.log("Extracted Text: ", text); // Debugging
+
+                    let extractedID = text.match(/\b\d{6,}\b/); // Extract only numbers (6+ digits)
+                    if (extractedID && validStudentIDs.includes(extractedID[0])) {
+                        document.getElementById("verificationStatus").innerText = "✅ Student Verified";
+                        document.getElementById("complaintSection").style.display = "block";
+                        document.getElementById("refNo").innerText = generateRefNo();
+                    } else {
+                        document.getElementById("verificationStatus").innerText = "❌ Invalid Student ID";
+                    }
+                })
+                .catch(err => {
+                    console.error("OCR Error:", err);
+                    document.getElementById("verificationStatus").innerText = "❌ OCR Failed. Try Again.";
+                });
+        }
+
+        function generateRefNo() {
+            return "COMP" + Math.floor(100000 + Math.random() * 900000);
+        }
+
+        // Submit Complaint
+        document.getElementById("complaintForm").addEventListener("submit", function(event) {
+            event.preventDefault();
+            let complaintText = document.getElementById("complaint").value;
+            let refNo = document.getElementById("refNo").innerText;
+
+            let complaints = JSON.parse(localStorage.getItem("complaints")) || [];
+            complaints.push({ refNo, complaint: complaintText, status: "Pending" });
+
+            localStorage.setItem("complaints", JSON.stringify(complaints));
+            alert("Complaint submitted successfully!\nReference No: " + refNo);
+            this.reset();
+        });
+    </script>
+</body>
+</html>
