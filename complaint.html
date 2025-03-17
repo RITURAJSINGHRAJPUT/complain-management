@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>File a Complaint</title>
     <link rel="stylesheet" href="styles.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/4.0.2/tesseract.min.js"></script>
+    <script async src="https://docs.opencv.org/4.x/opencv.js"></script>
 </head>
 <body>
     <nav>
@@ -22,7 +22,7 @@
         <video id="camera" autoplay></video>
         <button class="btn" onclick="captureImage()">Scan ID Card</button>
         <canvas id="canvas" style="display:none;"></canvas>
-        <p id="verificationStatus"></p>
+        <p id="verificationStatus">Please scan your ID.</p>
     </section>
 
     <section id="complaintSection" style="display:none;">
@@ -35,53 +35,72 @@
     </section>
 
     <script>
-        // List of valid student IDs for verification
-        const validStudentIDs = ["2024001", "2024002", "2024003"]; // Add actual student IDs
+        let refImagePath = "id_template.jpg";  // Add your template ID image here
+        let isOpencvLoaded = false;
 
-        // Camera Setup
-        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment", width: 1280, height: 720 } })
+        // Load OpenCV
+        function onOpenCvReady() {
+            isOpencvLoaded = true;
+            console.log("OpenCV Loaded Successfully!");
+        }
+
+        // Start Camera
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
             .then(stream => {
-                document.getElementById('camera').srcObject = stream;
+                document.getElementById("camera").srcObject = stream;
             });
 
         function captureImage() {
             let video = document.getElementById("camera");
             let canvas = document.getElementById("canvas");
             let ctx = canvas.getContext("2d");
+
             canvas.width = video.videoWidth;
             canvas.height = video.videoHeight;
             ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-            // Convert to Image URL
             let imageURL = canvas.toDataURL("image/png");
-            processOCR(imageURL);
+            verifyID(imageURL);
         }
 
-        function processOCR(imageURL) {
-            Tesseract.recognize(imageURL, 'eng')
-                .then(({ data: { text } }) => {
-                    console.log("Extracted Text: ", text); // Debugging
+        function verifyID(imageURL) {
+            if (!isOpencvLoaded) {
+                alert("Error: OpenCV is still loading. Try again in a few seconds.");
+                return;
+            }
 
-                    let extractedID = text.match(/\b\d{6,}\b/); // Extract only numbers (6+ digits)
-                    if (extractedID && validStudentIDs.includes(extractedID[0])) {
-                        document.getElementById("verificationStatus").innerText = "✅ Student Verified";
-                        document.getElementById("complaintSection").style.display = "block";
-                        document.getElementById("refNo").innerText = generateRefNo();
-                    } else {
-                        document.getElementById("verificationStatus").innerText = "❌ Invalid Student ID";
-                    }
-                })
-                .catch(err => {
-                    console.error("OCR Error:", err);
-                    document.getElementById("verificationStatus").innerText = "❌ OCR Failed. Try Again.";
-                });
+            let userImg = cv.imread(imageURL);
+            let refImg = cv.imread(refImagePath);
+
+            let userGray = new cv.Mat();
+            let refGray = new cv.Mat();
+
+            cv.cvtColor(userImg, userGray, cv.COLOR_RGBA2GRAY);
+            cv.cvtColor(refImg, refGray, cv.COLOR_RGBA2GRAY);
+
+            let diff = new cv.Mat();
+            cv.absdiff(userGray, refGray, diff);
+
+            let nonZero = cv.countNonZero(diff);
+            console.log("Difference Score:", nonZero);
+
+            if (nonZero < 10000) { // Adjust threshold for better accuracy
+                document.getElementById("verificationStatus").innerText = "✅ ID Verified!";
+                document.getElementById("complaintSection").style.display = "block";
+                document.getElementById("refNo").innerText = generateRefNo();
+            } else {
+                document.getElementById("verificationStatus").innerText = "❌ ID Verification Failed!";
+            }
+
+            userImg.delete(); refImg.delete();
+            userGray.delete(); refGray.delete();
+            diff.delete();
         }
 
         function generateRefNo() {
             return "COMP" + Math.floor(100000 + Math.random() * 900000);
         }
 
-        // Submit Complaint
         document.getElementById("complaintForm").addEventListener("submit", function(event) {
             event.preventDefault();
             let complaintText = document.getElementById("complaint").value;
